@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي التمثيل بالأعمدة - عمل الطالبة رهف المالكي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #74b9ff, #a29bfe);
+            font-family: 'Tajawal', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 620px;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .badge {
+            background: #6c5ce7;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 10px;
+            font-size: 15px;
+            display: inline-block;
+            margin-bottom: 12px;
+            font-weight: 900;
+        }
+        h1 {
+            color: #d63031;
+            font-size: 21px;
+            margin: 0 0 10px 0;
+        }
+        .question-box {
+            background: #f1f2f6;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 17px;
+            font-weight: 900;
+            color: #2d3436;
+            border-right: 5px solid #0984e3;
+            text-align: right;
+        }
+        
+        /* تصميم الرسم البياني الحقيقي للأعمدة */
+        .chart-container {
+            position: relative;
+            height: 220px;
+            background: #fff;
+            border-radius: 10px;
+            margin: 20px 0 10px 0;
+            padding: 10px 10px 5px 10px;
+            border-bottom: 3px solid #2d3436;
+            border-right: 3px solid #2d3436;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+        }
+        .bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            height: 100%;
+            justify-content: flex-end;
+            margin: 0 6px;
+        }
+        .bar {
+            width: 100%;
+            max-width: 45px;
+            background: linear-gradient(180deg, #0984e3, #74b9ff);
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            color: white;
+            font-weight: 900;
+            font-size: 14px;
+            padding-top: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: height 0.5s ease;
+        }
+        .bar-label {
+            margin-top: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #2d3436;
+            text-align: center;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .btn {
+            background: #fff;
+            border: 2px solid #74b9ff;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn:hover:not(:disabled) {
+            background: #74b9ff;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .btn.correct { background: #00b894 !important; color: white !important; border-color: #00b894; }
+        .btn.wrong { background: #d63031 !important; color: white !important; border-color: #d63031; }
+        
+        .feedback {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px;
+            border-radius: 10px;
+            display: none;
+        }
+        .next-btn {
+            margin-top: 15px;
+            width: 100%;
+            background: #e17055;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            display: none;
+        }
+        .next-btn:hover { background: #d63031; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="badge">✨ عمل الطالبة المبدعة: رهف المالكي ✨</div>
+    <h1>📊 مسابقة درس التمثيل بالأعمدة (الصف الرابع الابتدائي)</h1>
+
+    <div id="quiz-container">
+        <div style="font-weight: bold; color: #636e72; margin-bottom: 5px; text-align: right;" id="progress-text">السؤال 1 من 10</div>
+        <div class="question-box" id="q-text">جاري التحميل...</div>
+
+        <!-- الرسم البياني للأعمدة المرئية -->
+        <div class="chart-container" id="chart-container"></div>
+
+        <div class="options" id="options-area"></div>
+        <div class="feedback" id="feedback-msg"></div>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">السؤال التالي ➡️</button>
+    </div>
+
+    <div id="result-container" style="display: none;">
+        <h2>🎉 أنجزتِ التحدي بنجاح يا بطلة! 🎉</h2>
+        <h3 id="final-score" style="font-size: 32px; color: #00b894; margin: 15px 0;"></h3>
+        <p style="font-weight: bold; color: #636e72;">أداء رائع ومميز في قراءة التمثيل بالأعمدة!</p>
+        <button class="btn" style="background: #0984e3; color: white; width: 100%; margin-top: 15px;" onclick="startQuiz()">🔄 إعادة التحدي بأسئلة وأمثلة جديدة</button>
+    </div>
+</div>
+
+<script>
+    // أمثلة مقتبسة حرفياً من كتاب الرياضيات للصف الرابع الابتدائي (المنهج السعودي)
+    const bookExercises = [
+        {
+            title: "وسيلة المواصلات إلى المدرسة",
+            unit: "طالبة",
+            data: [{name: "الحافلة", val: 8}, {name: "السيارة", val: 4}, {name: "المشي", val: 6}, {name: "الدراجة", val: 2}]
+        },
+        {
+            title: "الحيوان المفضّل في حديقة الحيوان",
+            unit: "طالبة",
+            data: [{name: "الأرنب", val: 10}, {name: "الغزال", val: 6}, {name: "القرد", val: 8}, {name: "الأسد", val: 4}]
+        },
+        {
+            title: "عدد الأشجار المثمرة في الحديقة",
+            unit: "شجرة",
+            data: [{name: "النخيل", val: 6}, {name: "الزيتون", val: 4}, {name: "الليمون", val: 8}, {name: "التفاح", val: 2}]
+        },
+        {
+            title: "أنواع الطيور المفضلة لدى الطالبات",
+            unit: "طالبة",
+            data: [{name: "الصقر", val: 4}, {name: "البلبل", val: 8}, {name: "الحمام", val: 6}, {name: "العصافير", val: 10}]
+        },
+        {
+            title: "الفاكهة المفضلة لدى أطفال الفصل",
+            unit: "طالب",
+            data: [{name: "التفاح", val: 9}, {name: "الموز", val: 5}, {name: "البرتقال", val: 7}, {name: "العنب", val: 3}]
+        }
+    ];
+
+    let quizQuestions = [];
+    let currentIdx = 0;
+    let score = 0;
+    let answered = false;
+
+    function startQuiz() {
+        currentIdx = 0;
+        score = 0;
+        quizQuestions = [];
+
+        document.getElementById('result-container').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+
+        // توليد 10 أسئلة عشوائية بتبديل الترتيب في كل مرة يفتح فيها البرنامج
+        for (let i = 0; i < 10; i++) {
+            let template = bookExercises[Math.floor(Math.random() * bookExercises.length)];
+            let shuffledData = [...template.data].sort(() => Math.random() - 0.5);
+            
+            let qType = Math.floor(Math.random() * 3) + 1;
+            let qText = "";
+            let correctAns = "";
+            let optionsArr = [];
+
+            if (qType === 1) {
+                let maxItem = shuffledData.reduce((prev, current) => (prev.val > current.val) ? prev : current);
+                qText = `بناءً على تمثيل (${template.title})، ما هو الخيار الأكثر تفضيلاً (الأعلى عموداً)؟`;
+                correctAns = maxItem.name;
+                optionsArr = shuffledData.map(d => d.name);
+            } else if (qType === 2) {
+                let target = shuffledData[Math.floor(Math.random() * shuffledData.length)];
+                qText = `بناءً على التمثيل بالأعمدة لـ (${template.title})، ما هو العدد الذي يمثله عمود (${target.name})؟`;
+                correctAns = target.val.toString();
+                optionsArr = [correctAns, (target.val + 2).toString(), Math.max(1, target.val - 2).toString(), (target.val + 4).toString()];
+            } else {
+                let item1 = shuffledData[0];
+                let item2 = shuffledData[1];
+                let sum = item1.val + item2.val;
+                qText = `بناءً على التمثيل بالأعمدة لـ (${template.title})، ما مجموع عدد (${template.unit}) لـ (${item1.name}) و (${item2.name}) معاً؟`;
+                correctAns = sum.toString();
+                optionsArr = [correctAns, (sum + 2).toString(), Math.max(2, sum - 2).toString(), (sum + 4).toString()];
+            }
+
+            let uniqueOpts = [...new Set(optionsArr)].sort(() => Math.random() - 0.5);
+
+            quizQuestions.push({
+                title: template.title,
+                text: qText,
+                data: shuffledData,
+                correct: correctAns,
+                options: uniqueOpts
+            });
+        }
+
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        answered = false;
+        let q = quizQuestions[currentIdx];
+        
+        document.getElementById('progress-text').innerText = `السؤال ${currentIdx + 1} من 10`;
+        document.getElementById('q-text').innerText = q.text;
+
+        // رسم الأعمدة بشكل مرئي ودقيق
+        let chartContainer = document.getElementById('chart-container');
+        chartContainer.innerHTML = '';
+        
+        let maxVal = Math.max(...q.data.map(d => d.val));
+
+        q.data.forEach(item => {
+            // حساب الارتفاع بالنسبة المئوية لضمان ظهور الأعمدة بوضوح تام ودون أي تعليق
+            let heightPercent = Math.max(25, (item.val / (maxVal + 2)) * 150); 
+            
+            chartContainer.innerHTML += `
+                <div class="bar-wrapper">
+                    <div class="bar" style="height: ${heightPercent}px;">${item.val}</div>
+                    <div class="bar-label">${item.name}</div>
+                </div>
+            `;
+        });
+
+        let optionsArea = document.getElementById('options-area');
+        optionsArea.innerHTML = '';
+
+        q.options.forEach(opt => {
+            let btn = document.createElement('button');
+            btn.className = 'btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAns(btn, opt, q.correct);
+            optionsArea.appendChild(btn);
+        });
+
+        document.getElementById('feedback-msg').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function checkAns(btn, selected, correct) {
+        if (answered) return;
+        answered = true;
+
+        let allBtns = document.querySelectorAll('.options .btn');
+        allBtns.forEach(b => {
+            b.disabled = true;
+            if (b.innerText === correct) b.classList.add('correct');
+        });
+
+        let fb = document.getElementById('feedback-msg');
+        fb.style.display = 'block';
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            fb.style.background = '#e8f8f5';
+            fb.style.color = '#00b894';
+            fb.innerText = '✨ أحسنتِ يا بطلة! إجابة صحيحة 🌟';
+            score += 10;
+        } else {
+            btn.classList.add('wrong');
+            fb.style.background = '#fdeaea';
+            fb.style.color = '#d63031';
+            fb.innerText = `❌ محاولة رائعة! الإجابة الصحيحة هي: (${correct})`;
+        }
+
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < 10) {
+            loadQuestion();
+        } else {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('result-container').style.display = 'block';
+            document.getElementById('final-score').innerText = `نسبتك النهائية: ${score}%`;
+        }
+    }
+
+    startQuiz();
+</script>
+
+</body>
+</html>
